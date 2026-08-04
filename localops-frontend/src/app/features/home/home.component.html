@@ -1,0 +1,90 @@
+<!-- NAVBAR -->
+
+<header class="navbar">
+  <div class="logo">
+    <span class="logo-icon">🛒</span>
+    MarketMitra
+  </div>
+
+  <nav class="nav-links">
+    <a routerLink="/">Home</a>
+    <a>Categories</a>
+    <a>Shops</a>
+    <a>About</a>
+  </nav>
+
+  <div class="nav-actions">
+    <input type="text" placeholder="Search products or shops" class="search-input">
+    <button class="nav-btn login-btn" (click)="openModal('login')">Login</button>
+    <button class="nav-btn register-btn" (click)="openModal('register')">Register</button>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+
+<section class="hero-section">
+  <h1>Welcome to MarketMitra</h1>
+  <p>Your local marketplace for buying and selling</p>
+</section>
+
+<!-- LOGIN MODAL -->
+
+<div class="modal-overlay" *ngIf="modalType === 'login'" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()" aria-label="Close">×</button>
+    <h2 class="modal-title">Log In</h2>
+
+    <div class="role-grid">
+      <div class="role-option">
+        <div class="role-image">
+          <img src="assets/icons/buyer.svg" alt="Buyer">
+        </div>
+        <h3>Log In as Buyer</h3>
+        <a routerLink="/buyer-login" class="role-btn" (click)="closeModal()">Log In as Buyer »</a>
+      </div>
+
+      <div class="role-option">
+        <div class="role-image">
+          <img src="assets/icons/seller.svg" alt="Seller">
+        </div>
+        <h3>Log In as Seller</h3>
+        <a routerLink="/seller-login" class="role-btn" (click)="closeModal()">Log In as Seller »</a>
+      </div>
+
+      <div class="role-option">
+        <div class="role-image">
+          <img src="assets/icons/admin.svg" alt="Admin">
+        </div>
+        <h3>Log In as Admin</h3>
+        <a routerLink="/login" class="role-btn" (click)="closeModal()">Log In as Admin »</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+
+<div class="modal-overlay" *ngIf="modalType === 'register'" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeModal()" aria-label="Close">×</button>
+    <h2 class="modal-title">Register</h2>
+
+    <div class="role-grid register-grid">
+      <div class="role-option">
+        <div class="role-image">
+          <img src="assets/icons/buyer.svg" alt="Buyer">
+        </div>
+        <h3>Register as Buyer</h3>
+        <a routerLink="/register" class="role-btn" (click)="closeModal()">Register as Buyer »</a>
+      </div>
+
+      <div class="role-option">
+        <div class="role-image">
+          <img src="assets/icons/seller.svg" alt="Seller">
+        </div>
+        <h3>Register as Seller</h3>
+        <a routerLink="/seller-register" class="role-btn" (click)="closeModal()">Register as Seller »</a>
+      </div>
+    </div>
+  </div>
+</div>

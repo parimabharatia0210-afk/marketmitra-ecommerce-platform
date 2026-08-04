@@ -1,0 +1,381 @@
+<div class="buyer-shell">
+  
+  <div class="toast" *ngIf="toastMessage" [class.show]="toastMessage">
+    <svg viewBox="0 0 24 24" width="20" height="20">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      <polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></polyline>
+    </svg>
+    {{ toastMessage }}
+  </div>
+
+  <header class="top-nav" *ngIf="currentTab === 'home'">
+    <div class="search-container">
+      <svg viewBox="0 0 24 24" class="search-icon">
+        <path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <input type="text" [(ngModel)]="searchQuery" (input)="filterProducts()" placeholder="Search products or shops...">
+    </div>
+  </header>
+
+  <main class="content-area" [class.has-top-nav]="currentTab === 'home'">
+    
+    <!-- HOME TAB -->
+    <ng-container *ngIf="currentTab === 'home'">
+      <div class="data-state loading" *ngIf="loadingProducts">Loading products...</div>
+      
+      <div class="product-grid" *ngIf="!loadingProducts && filteredProducts.length">
+        <article class="product-card" *ngFor="let product of filteredProducts" (click)="viewProduct(product)">
+          <button class="heart-overlay" [class.filled]="isFavorite(product)" (click)="toggleFavorite(product, $event)">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <div class="product-image">
+            <img *ngIf="product.images?.length" [src]="getMediaUrl(product.images[0])" [alt]="product.name">
+            <div class="no-image" *ngIf="!product.images?.length">No Image</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="seller-code">{{ product.seller?.shopName || product.sellerCode }}</p>
+            <div class="pricing">
+              <span class="discount-badge" *ngIf="product.discountPercentage > 0">{{ product.discountPercentage }}% OFF &darr;</span>
+              <span class="base-price" *ngIf="product.discountPercentage > 0">&#8377;{{ product.price }}</span>
+              <span class="final-price">&#8377;{{ product.finalPrice }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="data-state" *ngIf="!loadingProducts && !filteredProducts.length">
+        We couldn't find any products matching your search.
+      </div>
+    </ng-container>
+
+    <!-- PRODUCT DETAILS TAB -->
+    <ng-container *ngIf="currentTab === 'product-details' && selectedProduct">
+      <div class="product-details-view">
+        <button class="ghost-btn back-btn" type="button" (click)="backToHome()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          Back
+        </button>
+        
+        <div class="detail-layout">
+          <div class="detail-image-section">
+            <div class="detail-image">
+              <img *ngIf="selectedProduct.images?.length" [src]="getMediaUrl(selectedProduct.images[selectedImageIndex])" [alt]="selectedProduct.name">
+              <div class="no-image" *ngIf="!selectedProduct.images?.length">No Image Available</div>
+            </div>
+            
+            <div class="thumbnails" *ngIf="selectedProduct.images?.length > 1">
+              <button class="thumb" 
+                   *ngFor="let img of selectedProduct.images; let i = index"
+                   [class.active]="selectedImageIndex === i"
+                   (click)="selectedImageIndex = i">
+                <img [src]="getMediaUrl(img)">
+              </button>
+            </div>
+          </div>
+          
+          <div class="detail-content">
+            <p class="detail-shop">{{ selectedProduct.seller?.shopName || selectedProduct.sellerCode }}</p>
+            <h1 class="detail-name">{{ selectedProduct.name }}</h1>
+            
+            <!-- Stacked Pricing Layout Preserved -->
+            <div class="pricing-stacked">
+              <span class="discount" *ngIf="selectedProduct.discountPercentage > 0">{{ selectedProduct.discountPercentage }}% OFF &darr;</span>
+              <div class="prices-row">
+                <span class="base-price" *ngIf="selectedProduct.discountPercentage > 0">&#8377;{{ selectedProduct.price }}</span>
+                <span class="final-price">&#8377;{{ selectedProduct.finalPrice }}</span>
+              </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="detail-desc">
+              <h3>Description</h3>
+              <p>{{ selectedProduct.description }}</p>
+            </div>
+            
+            <div class="detail-actions">
+              <button class="heart-action-btn" [class.filled]="isFavorite(selectedProduct)" (click)="toggleFavorite(selectedProduct)">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </button>
+              <button class="ghost-btn" type="button" (click)="addToCart(selectedProduct, $event)">Add to Cart</button>
+              <button class="primary-btn" type="button" (click)="buyNow(selectedProduct)">Buy Now</button>
+            </div>
+
+            <!-- Reviews Placeholder -->
+            <div class="reviews-section">
+              <h3>Reviews from buyers</h3>
+              <div class="no-reviews">
+                No one tried this product yet. Be the 1st one and share the review!
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- CART TAB -->
+    <ng-container *ngIf="currentTab === 'cart'">
+      <div class="tab-header">
+        <h1>Your Cart <span class="cart-count" *ngIf="cart.length">({{ cart.length }})</span></h1>
+      </div>
+      
+      <div class="cart-layout" *ngIf="cart.length; else emptyCart">
+        <!-- Cart Items -->
+        <div class="cart-items-col">
+          <div class="cart-item" *ngFor="let item of cart">
+            <div class="cart-img">
+              <img *ngIf="item.images?.length" [src]="getMediaUrl(item.images[0])" [alt]="item.name">
+              <div class="cart-no-img" *ngIf="!item.images?.length">📦</div>
+            </div>
+            <div class="cart-info">
+              <p class="cart-shop">{{ item.seller?.shopName || item.sellerCode }}</p>
+              <h4>{{ item.name }}</h4>
+              <div class="cart-pricing">
+                <span class="cart-price">₹{{ item.finalPrice }}</span>
+                <span class="cart-unit-note" *ngIf="(item.quantity || 1) > 1">each</span>
+              </div>
+
+              <!-- Quantity + Remove + Buy Now row -->
+              <div class="cart-actions-row">
+                <!-- Quantity Control -->
+                <div class="qty-control">
+                  <button class="qty-btn" (click)="decrementQty(item)" [disabled]="item.quantity <= 1">−</button>
+                  <span class="qty-value">{{ item.quantity || 1 }}</span>
+                  <button class="qty-btn" (click)="incrementQty(item)">+</button>
+                </div>
+
+                <!-- Remove -->
+                <button class="remove-btn" (click)="removeFromCart(item, $event)">
+                  <svg viewBox="0 0 24 24" width="14" height="14">
+                    <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    <path d="M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                  </svg>
+                  Remove
+                </button>
+
+                <!-- Buy Now (this item only) -->
+                <button class="buy-now-btn" (click)="buyNow(item)">
+                  <svg viewBox="0 0 24 24" width="14" height="14">
+                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                  </svg>
+                  Buy Now
+                </button>
+              </div>
+            </div>
+
+            <!-- Item subtotal -->
+            <div class="cart-subtotal">
+              ₹{{ (item.finalPrice * (item.quantity || 1)).toFixed(2) }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Panel -->
+        <div class="cart-total-panel">
+          <h3 class="total-title">Price Details</h3>
+          <div class="price-row" *ngFor="let item of cart">
+            <span class="price-label">{{ item.name | slice:0:20 }}{{ item.name.length > 20 ? '…' : '' }} × {{ item.quantity || 1 }}</span>
+            <span>₹{{ (item.finalPrice * (item.quantity || 1)).toFixed(2) }}</span>
+          </div>
+          <div class="price-divider"></div>
+          <div class="price-row total-row">
+            <span>Total Amount</span>
+            <span class="total-green">₹{{ getCartTotal().toFixed(2) }}</span>
+          </div>
+          <button class="checkout-btn" (click)="goToCheckout()">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            </svg>
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
+
+      <ng-template #emptyCart>
+        <div class="data-state">Your cart is currently empty.</div>
+      </ng-template>
+    </ng-container>
+
+
+    <!-- FAVORITES TAB -->
+    <ng-container *ngIf="currentTab === 'favorites'">
+      <div class="tab-header">
+        <h1>Favorites</h1>
+      </div>
+      
+      <div class="product-grid" *ngIf="favorites.length; else emptyFavs">
+        <article class="product-card" *ngFor="let product of favorites" (click)="viewProduct(product)">
+          <button class="heart-overlay filled" (click)="toggleFavorite(product, $event)">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+          <div class="product-image">
+            <img *ngIf="product.images?.length" [src]="getMediaUrl(product.images[0])" [alt]="product.name">
+            <div class="no-image" *ngIf="!product.images?.length">No Image</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="seller-code">{{ product.seller?.shopName || product.sellerCode }}</p>
+            <div class="pricing">
+              <span class="discount-badge" *ngIf="product.discountPercentage > 0">{{ product.discountPercentage }}% OFF &darr;</span>
+              <span class="base-price" *ngIf="product.discountPercentage > 0">&#8377;{{ product.price }}</span>
+              <span class="final-price">&#8377;{{ product.finalPrice }}</span>
+            </div>
+          </div>
+        </article>
+      </div>
+      <ng-template #emptyFavs>
+        <div class="data-state">You haven't favored any items yet.</div>
+      </ng-template>
+    </ng-container>
+
+    <!-- ORDERS TAB -->
+    <ng-container *ngIf="currentTab === 'orders'">
+      <div class="tab-header">
+        <h1>Your Orders</h1>
+      </div>
+      <div class="data-state loading" *ngIf="loadingOrders">Loading orders...</div>
+      <div class="data-state" *ngIf="!loadingOrders && !orders.length">You haven't placed any orders yet.</div>
+      <div class="orders-list" *ngIf="!loadingOrders && orders.length">
+        <div class="order-card" *ngFor="let order of orders">
+          <div class="order-card-header">
+            <div>
+              <span class="order-status" [class.status-placed]="order.status === 'Placed'">{{ order.status }}</span>
+              <p class="order-date">{{ order.createdAt | date:'d MMM yyyy, h:mm a' }}</p>
+            </div>
+            <div class="order-total-badge">₹{{ order.totalAmount.toFixed(2) }}</div>
+          </div>
+          <div class="order-items">
+            <div class="order-item" *ngFor="let item of order.items">
+              <span class="order-item-name">{{ item.name }}</span>
+              <span class="order-item-meta">× {{ item.quantity }} &nbsp; ₹{{ (item.price * item.quantity).toFixed(2) }}</span>
+            </div>
+          </div>
+          <div class="order-address">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+            {{ order.deliveryAddress?.addressLine }}, {{ order.deliveryAddress?.city }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- PROFILE TAB -->
+    <ng-container *ngIf="currentTab === 'profile'">
+      <div class="tab-header">
+        <h1>Profile</h1>
+        <button class="danger-text-btn" type="button" (click)="logout()">Logout</button>
+      </div>
+      
+      <div class="data-state loading" *ngIf="loadingProfile">Loading profile...</div>
+
+      <div class="profile-container" *ngIf="!loadingProfile && buyerData">
+        <div class="avatar-header">
+          <div class="avatar-circle">{{ initials }}</div>
+          <div>
+            <h2 class="buyer-name">{{ buyerData.name }}</h2>
+            <p class="buyer-email">{{ buyerData.email }}</p>
+          </div>
+        </div>
+
+        <form class="profile-form" [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+          <div *ngIf="profileError" class="alert error">{{ profileError }}</div>
+          <div *ngIf="profileMessage" class="alert success">{{ profileMessage }}</div>
+
+          <div class="form-section">
+            <h3>Personal Details</h3>
+            <label>
+              <span>Full Name *</span>
+              <input type="text" formControlName="name">
+            </label>
+            <label>
+              <span>Contact Number *</span>
+              <input type="text" formControlName="contact">
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h3>Shipping Address</h3>
+            <label>
+              <span>Address Line</span>
+              <input type="text" formControlName="address">
+            </label>
+            <label>
+              <span>City</span>
+              <input type="text" formControlName="city">
+            </label>
+            <div class="split-row">
+              <label>
+                <span>State</span>
+                <input type="text" formControlName="state">
+              </label>
+              <label>
+                <span>Pincode / PO No.</span>
+                <input type="text" formControlName="pincode">
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="primary-btn w-full" [disabled]="isSubmittingProfile || profileForm.invalid">
+            {{ isSubmittingProfile ? 'Saving...' : 'Update Profile' }}
+          </button>
+        </form>
+      </div>
+    </ng-container>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item" [class.active]="currentTab === 'home' || currentTab === 'product-details'" (click)="setTab('home')">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+        <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+      Home
+    </button>
+    
+    <button class="nav-item" [class.active]="currentTab === 'cart'" (click)="setTab('cart')">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <path d="M9 20a1 1 0 100 2 1 1 0 000-2zm11 0a1 1 0 100 2 1 1 0 000-2zm-1.8-4H7.4a2 2 0 01-2-1.6L3 4H1" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M5 4h17l-1.6 9H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span class="badge" *ngIf="cart.length">{{ cart.length }}</span>
+      </div>
+      Cart
+    </button>
+    
+    <button class="nav-item" [class.active]="currentTab === 'favorites'" (click)="setTab('favorites')">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      </svg>
+      Favorites
+    </button>
+
+    <button class="nav-item" [class.active]="currentTab === 'orders'" (click)="setTab('orders')">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M21 8v13H3V8M1 3h22v5H1z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+        <path d="M10 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Orders
+    </button>
+
+    <button class="nav-item" [class.active]="currentTab === 'profile'" (click)="setTab('profile')">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/>
+      </svg>
+      Profile
+    </button>
+  </nav>
+</div>

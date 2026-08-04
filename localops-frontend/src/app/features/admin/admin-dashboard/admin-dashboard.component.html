@@ -1,0 +1,406 @@
+<div class="admin-shell">
+
+  <!-- TOAST -->
+  <div class="toast" [class.show]="toastMessage" [class.toast-error]="toastType === 'error'">
+    <svg *ngIf="toastType === 'success'" viewBox="0 0 24 24" width="18" height="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    <svg *ngIf="toastType === 'error'" viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+    {{ toastMessage }}
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-brand">
+      <div class="sb-logo">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="sb-title" *ngIf="!sidebarCollapsed">MarketMitra</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-link" [class.active]="activePanel === 'overview'" (click)="setPanel('overview')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+        <span *ngIf="!sidebarCollapsed">Dashboard</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'users'" (click)="setPanel('users')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span *ngIf="!sidebarCollapsed">Users</span>
+        <span class="nav-badge" *ngIf="!sidebarCollapsed && stats.totalUsers">{{ stats.totalUsers }}</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'sellers'" (click)="setPanel('sellers')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span *ngIf="!sidebarCollapsed">Sellers</span>
+        <span class="nav-badge" *ngIf="!sidebarCollapsed && stats.totalSellers">{{ stats.totalSellers }}</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'products'" (click)="setPanel('products')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2"/></svg>
+        <span *ngIf="!sidebarCollapsed">Products</span>
+        <span class="nav-badge" *ngIf="!sidebarCollapsed && stats.totalProducts">{{ stats.totalProducts }}</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'orders'" (click)="setPanel('orders')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <span *ngIf="!sidebarCollapsed">Orders</span>
+        <span class="nav-badge" *ngIf="!sidebarCollapsed && stats.totalOrders">{{ stats.totalOrders }}</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'settings'" (click)="setPanel('settings')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <span *ngIf="!sidebarCollapsed">Settings</span>
+      </button>
+      <button class="nav-link" [class.active]="activePanel === 'add-admin'" (click)="setPanel('add-admin')">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="8.5" cy="7" r="4"></circle>
+          <line x1="20" y1="8" x2="20" y2="14"></line>
+          <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        <span *ngIf="!sidebarCollapsed">Add New Admin</span>
+      </button>
+    </nav>
+
+    <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" [style.transform]="sidebarCollapsed ? 'rotate(180deg)' : ''"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <!-- TOP NAVBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="panel-title">
+          {{ activePanel === 'overview' ? 'Dashboard Overview' :
+             activePanel === 'users' ? 'User Management' :
+             activePanel === 'sellers' ? 'Seller Management' :
+             activePanel === 'products' ? 'Product Management' :
+             activePanel === 'orders' ? 'Order Management' : 
+             activePanel === 'add-admin' ? 'Add New Admin' : 'Settings' }}
+        </h2>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-chip">
+          <div class="admin-avatar">{{ initials }}</div>
+          <div *ngIf="!sidebarCollapsed">
+            <p class="admin-chip-name">{{ adminName }}</p>
+            <p class="admin-chip-role">Super Admin</p>
+          </div>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="panel-content">
+
+      <!-- ═══════════════ OVERVIEW ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'overview'">
+        <div class="loading-bar" *ngIf="loadingStats">Loading stats...</div>
+        <div class="stats-grid" *ngIf="!loadingStats">
+          <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+            <div class="stat-info">
+              <p class="stat-num">{{ stats.totalUsers || 0 }}</p>
+              <p class="stat-label">Total Users</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+            <div class="stat-info">
+              <p class="stat-num">{{ stats.totalSellers || 0 }}</p>
+              <p class="stat-label">Total Sellers</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="2" fill="none"/></svg></div>
+            <div class="stat-info">
+              <p class="stat-num">{{ stats.totalProducts || 0 }}</p>
+              <p class="stat-label">Total Products</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none"><path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></div>
+            <div class="stat-info">
+              <p class="stat-num">{{ stats.totalOrders || 0 }}</p>
+              <p class="stat-label">Total Orders</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent rows -->
+        <div class="recent-grid" *ngIf="!loadingStats">
+          <div class="recent-card">
+            <h3 class="recent-title">Recent Users</h3>
+            <div class="recent-empty" *ngIf="!stats.recentUsers?.length">No users yet.</div>
+            <div class="recent-row" *ngFor="let u of stats.recentUsers">
+              <div class="recent-avatar">{{ u.name[0].toUpperCase() }}</div>
+              <div>
+                <p class="recent-name">{{ u.name }}</p>
+                <p class="recent-email">{{ u.email }}</p>
+              </div>
+              <span class="recent-date recent-push">{{ u.createdAt | date:'d MMM' }}</span>
+            </div>
+          </div>
+
+          <div class="recent-card">
+            <h3 class="recent-title">Recent Orders</h3>
+            <div class="recent-empty" *ngIf="!stats.recentOrders?.length">No orders yet.</div>
+            <div class="recent-row" *ngFor="let o of stats.recentOrders">
+              <div class="recent-avatar">₹</div>
+              <div>
+                <p class="recent-name">{{ o.buyerName }}</p>
+                <p class="recent-email">₹{{ o.totalAmount?.toFixed(2) }}</p>
+              </div>
+              <span class="order-status-mini">{{ o.status }}</span>
+            </div>
+          </div>
+
+          <div class="recent-card">
+            <h3 class="recent-title">Recent Sellers</h3>
+            <div class="recent-empty" *ngIf="!stats.recentSellers?.length">No sellers yet.</div>
+            <div class="recent-row" *ngFor="let s of stats.recentSellers">
+              <div class="recent-avatar">S</div>
+              <div>
+                <p class="recent-name">{{ s.shopName }}</p>
+                <p class="recent-email">{{ s.city }}</p>
+              </div>
+              <span class="recent-date recent-push">{{ s.createdAt | date:'d MMM' }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ USERS ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'users'">
+        <div class="panel-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            <input type="text" [(ngModel)]="userSearch" placeholder="Search users..." (input)="loadUsers()">
+          </div>
+          <button class="refresh-btn" (click)="loadUsers()">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="loading-bar" *ngIf="loadingUsers">Loading users...</div>
+        <div class="data-table" *ngIf="!loadingUsers">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Name</th><th>Email</th><th>Contact</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!users.length"><td colspan="7" class="empty-row">No users found.</td></tr>
+              <tr *ngFor="let u of users; let i = index">
+                <td class="row-num">{{ i + 1 }}</td>
+                <td><div class="name-cell"><div class="t-avatar">{{ u.name[0].toUpperCase() }}</div>{{ u.name }}</div></td>
+                <td class="muted-cell">{{ u.email }}</td>
+                <td class="muted-cell">{{ u.contact }}</td>
+                <td class="muted-cell">{{ u.createdAt | date:'d MMM yyyy' }}</td>
+                <td><span class="status-pill" [class.pill-blocked]="u.isBlocked">{{ u.isBlocked ? 'Blocked' : 'Active' }}</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="act-btn" (click)="toggleBlock(u)">{{ u.isBlocked ? 'Unblock' : 'Block' }}</button>
+                    <button class="act-btn act-danger" (click)="deleteUser(u)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ SELLERS ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'sellers'">
+        <div class="panel-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            <input type="text" [(ngModel)]="sellerSearch" placeholder="Search sellers..." (input)="loadSellers()">
+          </div>
+          <button class="refresh-btn" (click)="loadSellers()">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="loading-bar" *ngIf="loadingSellers">Loading sellers...</div>
+        <div class="data-table" *ngIf="!loadingSellers">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Shop Name</th><th>Owner</th><th>City</th><th>Code</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!sellers.length"><td colspan="7" class="empty-row">No sellers found.</td></tr>
+              <tr *ngFor="let s of sellers; let i = index">
+                <td class="row-num">{{ i + 1 }}</td>
+                <td><div class="name-cell"><div class="t-avatar seller-av">S</div>{{ s.shopName }}</div></td>
+                <td class="muted-cell">{{ s.name }}</td>
+                <td class="muted-cell">{{ s.city }}</td>
+                <td><span class="code-badge">{{ s.sellerCode }}</span></td>
+                <td><span class="status-pill" [class.pill-pending]="!s.isApproved">{{ s.isApproved ? 'Approved' : 'Pending' }}</span></td>
+                <td>
+                  <div class="action-btns">
+                    <button class="act-btn" (click)="toggleApprove(s)">{{ s.isApproved ? 'Reject' : 'Approve' }}</button>
+                    <button class="act-btn act-danger" (click)="deleteSeller(s)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ PRODUCTS ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'products'">
+        <div class="panel-toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            <input type="text" [(ngModel)]="productSearch" placeholder="Search products..." (input)="loadProducts()">
+          </div>
+          <button class="refresh-btn" (click)="loadProducts()">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="loading-bar" *ngIf="loadingProducts">Loading products...</div>
+        <div class="data-table" *ngIf="!loadingProducts">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Product</th><th>Shop</th><th>Price</th><th>Stock</th><th>Added</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!products.length"><td colspan="7" class="empty-row">No products found.</td></tr>
+              <tr *ngFor="let p of products; let i = index">
+                <td class="row-num">{{ i + 1 }}</td>
+                <td><div class="name-cell"><div class="t-avatar product-av">P</div><span class="product-name">{{ p.name }}</span></div></td>
+                <td class="muted-cell">{{ p.seller?.shopName || p.sellerCode }}</td>
+                <td><span class="price-val">₹{{ p.finalPrice }}</span></td>
+                <td><span class="stock-badge" [class.low-stock]="p.stock < 5">{{ p.stock }}</span></td>
+                <td class="muted-cell">{{ p.createdAt | date:'d MMM yyyy' }}</td>
+                <td>
+                  <button class="act-btn act-danger" (click)="deleteProduct(p)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ ORDERS ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'orders'">
+        <div class="panel-toolbar">
+          <p class="toolbar-info">Total Orders: <strong>{{ orders.length }}</strong></p>
+          <button class="refresh-btn" (click)="loadOrders()">
+            <svg viewBox="0 0 24 24" width="14" height="14"><path d="M23 4v6h-6M1 20v-6h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div class="loading-bar" *ngIf="loadingOrders">Loading orders...</div>
+        <div class="data-table" *ngIf="!loadingOrders">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Buyer</th><th>Email</th><th>Amount</th><th>Payment</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="!orders.length"><td colspan="7" class="empty-row">No orders found.</td></tr>
+              <tr *ngFor="let o of orders; let i = index">
+                <td class="row-num">{{ i + 1 }}</td>
+                <td><div class="name-cell"><div class="t-avatar order-av">₹</div>{{ o.buyerName }}</div></td>
+                <td class="muted-cell">{{ o.buyerEmail }}</td>
+                <td><span class="price-val">₹{{ o.totalAmount?.toFixed(2) }}</span></td>
+                <td class="muted-cell">{{ o.paymentMethod }}</td>
+                <td class="muted-cell">{{ o.createdAt | date:'d MMM yyyy' }}</td>
+                <td>
+                  <select class="status-select" [ngModel]="o.status" (ngModelChange)="updateStatus(o, $event)">
+                    <option *ngFor="let s of orderStatuses" [value]="s">{{ s }}</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ SETTINGS ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'settings'">
+        <div class="settings-layout">
+          <div class="settings-card">
+            <h3 class="settings-title">Change Password</h3>
+            <p class="settings-sub">Update your admin account password.</p>
+
+            <div class="alert success-alert" *ngIf="settingsMsg">{{ settingsMsg }}</div>
+            <div class="alert error-alert" *ngIf="settingsErr">{{ settingsErr }}</div>
+
+            <div class="s-field">
+              <label>Current Password</label>
+              <input type="password" [(ngModel)]="currentPassword" placeholder="••••••••">
+            </div>
+            <div class="s-field">
+              <label>New Password</label>
+              <input type="password" [(ngModel)]="newPassword" placeholder="Min 6 characters">
+            </div>
+            <div class="s-field">
+              <label>Confirm New Password</label>
+              <input type="password" [(ngModel)]="confirmPassword" placeholder="Repeat new password">
+            </div>
+            <button class="save-btn" [disabled]="savingPassword" (click)="changePassword()">
+              {{ savingPassword ? 'Saving...' : 'Update Password' }}
+            </button>
+          </div>
+
+          <div class="settings-card danger-zone">
+            <h3 class="settings-title danger-title">Session</h3>
+            <p class="settings-sub">End your current admin session.</p>
+            <button class="logout-danger-btn" (click)="logout()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ═══════════════ ADD NEW ADMIN ═══════════════ -->
+      <ng-container *ngIf="activePanel === 'add-admin'">
+        <div class="settings-layout" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+          <div class="settings-card" style="width: 100%; max-width: 400px; padding: 40px;">
+            <h3 class="settings-title" style="text-align: center;">Add New Admin</h3>
+            <p class="settings-sub" style="text-align: center;">Create an account for a new administrator.</p>
+
+            <div class="alert success-alert" *ngIf="addAdminMsg" style="background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid #22c55e; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; text-align: center;">{{ addAdminMsg }}</div>
+            <div class="alert error-alert" *ngIf="addAdminErr" style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid #ef4444; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; text-align: center;">{{ addAdminErr }}</div>
+
+            <div *ngIf="!otpSent">
+              <div class="s-field">
+                <label>Full Name</label>
+                <input type="text" [(ngModel)]="newAdmin.name" placeholder="Admin Name">
+              </div>
+              <div class="s-field">
+                <label>Email Address</label>
+                <input type="email" [(ngModel)]="newAdmin.email" placeholder="admin@marketmitra.com">
+              </div>
+              <div class="s-field">
+                <label>Password</label>
+                <input type="password" [(ngModel)]="newAdmin.password" placeholder="Min 6 characters">
+              </div>
+              <button class="save-btn" [disabled]="addingAdmin" (click)="submitAddAdmin()">
+                {{ addingAdmin ? 'Sending OTP...' : 'Continue' }}
+              </button>
+            </div>
+
+            <div *ngIf="otpSent">
+              <div class="s-field">
+                <label>Enter OTP</label>
+                <input type="text" [(ngModel)]="otpCode" placeholder="6-digit code sent to your email">
+              </div>
+              <button class="save-btn" [disabled]="verifyingOtp || addingAdmin" (click)="submitAddAdmin()">
+                {{ verifyingOtp ? 'Verifying...' : 'Verify & Add Admin' }}
+              </button>
+              <button class="save-btn" style="background: transparent; color: #9ca3af; margin-top: 10px;" (click)="otpSent = false; otpCode = ''; addAdminErr = ''; addAdminMsg = '';">
+                ← Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </main>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="navbar">
+  <div class="logo">
+    <span class="logo-icon">🛒</span>
+    <span>MarketMitra</span>
+  </div>
+  <a routerLink="/" class="back-btn">← Back</a>
+</div>
+
+<div class="container">
+  <div *ngIf="showSuccess" class="success-msg">
+    <span class="success-icon">✓</span>
+    <h3>Registered Successfully!</h3>
+    <p>Redirecting to login...</p>
+  </div>
+
+  <div *ngIf="!showSuccess">
+    <h2>Buyer Registration</h2>
+    <form [formGroup]="buyerForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Name <span class="required">*</span></label>
+          <input type="text" formControlName="name" placeholder="Your full name">
+          <span class="field-error" *ngIf="getFieldError('name')">{{ getFieldError('name') }}</span>
+        </div>
+
+        <div class="form-group">
+          <label>Email <span class="required">*</span></label>
+          <div style="display: flex; gap: 10px;">
+            <input type="email" formControlName="email" placeholder="your@email.com" (blur)="checkEmailOnBlur()" style="flex: 1;" [readonly]="otpVerified">
+            <button type="button" (click)="sendOtp()" [disabled]="buyerForm.get('email')?.invalid || isSendingOtp || emailExistsError || checkingEmail || otpSent" style="padding: 10px 15px; border-radius: 4px; border: none; background: #007bff; color: white; cursor: pointer; white-space: nowrap;">
+              {{ isSendingOtp ? 'Sending...' : (otpSent ? 'OTP Sent' : 'Send OTP') }}
+            </button>
+          </div>
+          <span class="field-error" *ngIf="checkingEmail">Checking...</span>
+          <span class="field-error" *ngIf="emailExistsError && !checkingEmail">This email is already registered</span>
+          <span class="field-error" *ngIf="getFieldError('email') && !emailExistsError">{{ getFieldError('email') }}</span>
+          <span class="success-text" *ngIf="otpVerified" style="color: green; font-size: 0.85rem; display: block; margin-top: 5px;">Email verified successfully! ✓</span>
+        </div>
+
+        <div class="form-group" *ngIf="otpSent">
+          <label>Enter OTP <span class="required">*</span></label>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" formControlName="otp" placeholder="6-digit OTP" maxlength="6" style="flex: 1;" [readonly]="otpVerified">
+            <button type="button" (click)="verifyOtp()" [disabled]="buyerForm.get('otp')?.invalid || isVerifyingOtp || otpVerified" style="padding: 10px 15px; border-radius: 4px; border: none; background: #28a745; color: white; cursor: pointer; white-space: nowrap;">
+              {{ otpVerified ? 'Verified' : (isVerifyingOtp ? 'Verifying...' : 'Verify') }}
+            </button>
+          </div>
+          <span class="field-error" *ngIf="otpError">{{ otpError }}</span>
+        </div>
+
+        <ng-container *ngIf="otpVerified">
+          <div class="form-group">
+            <label>Contact <span class="required">*</span></label>
+            <input type="text" formControlName="contact" placeholder="10-digit mobile number">
+            <span class="field-error" *ngIf="getFieldError('contact')">{{ getFieldError('contact') }}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Password <span class="required">*</span></label>
+            <input type="password" formControlName="password" placeholder="Min 6 characters">
+            <span class="field-error" *ngIf="getFieldError('password')">{{ getFieldError('password') }}</span>
+          </div>
+        </ng-container>
+      </div>
+
+      <div *ngIf="otpVerified">
+        <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <button type="submit" class="btn-submit" [disabled]="buyerForm.invalid || isSubmitting || emailExistsError || checkingEmail || !otpVerified">
+          {{ isSubmitting ? 'Registering...' : 'Register' }}
+        </button>
+      </div>
+      <p class="login-link">Already have an account? <a routerLink="/buyer-login">Login</a></p>
+    </form>
+  </div>
+</div>

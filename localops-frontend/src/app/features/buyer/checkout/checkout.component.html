@@ -1,0 +1,137 @@
+<div class="checkout-shell">
+
+  <!-- SUCCESS STATE -->
+  <div class="success-screen" *ngIf="orderPlaced">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" width="60" height="60">
+        <circle cx="12" cy="12" r="10" stroke="#22c55e" stroke-width="2" fill="none"/>
+        <path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <h1>Order Placed Successfully!</h1>
+    <p>We've sent a confirmation email to <strong>{{ buyerData?.email }}</strong></p>
+    <div class="order-id-badge">Order ID: {{ orderId }}</div>
+    <p class="cod-notice">💵 Pay <strong>Cash on Delivery</strong> when your order arrives.</p>
+    <button class="primary-btn" (click)="goToDashboard()">Continue Shopping</button>
+  </div>
+
+  <!-- CHECKOUT FORM -->
+  <ng-container *ngIf="!orderPlaced">
+    <div class="checkout-header">
+      <button class="back-btn" (click)="goBack()">
+        <svg viewBox="0 0 24 24" width="20" height="20">
+          <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        Back
+      </button>
+      <h1>Checkout</h1>
+    </div>
+
+    <div class="checkout-layout">
+
+      <!-- LEFT: Address + Payment -->
+      <div class="checkout-left">
+
+        <!-- DELIVERY ADDRESS -->
+        <section class="card">
+          <h2 class="section-title">
+            <span class="step-num">1</span>
+            Delivery Address
+          </h2>
+          <div class="form-grid">
+            <label class="full-col">
+              <span>Address Line *</span>
+              <input type="text" [(ngModel)]="addressLine" placeholder="House no, Street, Area">
+            </label>
+            <label>
+              <span>City *</span>
+              <input type="text" [(ngModel)]="city" placeholder="City">
+            </label>
+            <label>
+              <span>State *</span>
+              <input type="text" [(ngModel)]="state" placeholder="State">
+            </label>
+            <label>
+              <span>Pincode *</span>
+              <input type="text" [(ngModel)]="pincode" placeholder="Pincode">
+            </label>
+            <label>
+              <span>Contact Number *</span>
+              <input type="text" [(ngModel)]="contact" placeholder="Phone number">
+            </label>
+          </div>
+        </section>
+
+        <!-- PAYMENT METHOD -->
+        <section class="card">
+          <h2 class="section-title">
+            <span class="step-num">2</span>
+            Payment Method
+          </h2>
+          <div class="payment-option selected">
+            <span class="radio-dot"></span>
+            <div class="payment-info">
+              <span class="payment-label">Cash on Delivery (COD)</span>
+              <span class="payment-sub">Pay when your order arrives at your door.</span>
+            </div>
+            <svg viewBox="0 0 24 24" width="28" height="28" class="cod-icon">
+              <rect x="2" y="7" width="20" height="14" rx="2" stroke="#22c55e" stroke-width="2" fill="none"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="#22c55e" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT: Order Summary -->
+      <div class="checkout-right">
+        <section class="card summary-card">
+          <h2 class="section-title">
+            <span class="step-num">3</span>
+            Order Summary
+          </h2>
+
+          <div class="summary-items">
+            <div class="summary-item" *ngFor="let item of cart">
+              <div class="summary-thumb">
+                <img *ngIf="item.images?.length" [src]="getMediaUrl(item.images[0])" [alt]="item.name">
+                <div class="no-img" *ngIf="!item.images?.length">📦</div>
+              </div>
+              <div class="summary-info">
+                <p class="summary-name">{{ item.name }}</p>
+                <p class="summary-shop">{{ item.seller?.shopName || item.sellerCode }}</p>
+                <div class="summary-row">
+                  <span class="summary-qty">Qty: {{ item.quantity || 1 }}</span>
+                  <span class="summary-price">₹{{ (item.finalPrice * (item.quantity || 1)).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="total-row">
+            <span>Total Amount</span>
+            <span class="total-amount">₹{{ getCartTotal().toFixed(2) }}</span>
+          </div>
+
+          <div class="error-alert" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+          <button
+            class="place-order-btn"
+            [disabled]="!isFormValid() || isPlacingOrder"
+            (click)="placeOrder()">
+            <svg viewBox="0 0 24 24" width="20" height="20" *ngIf="!isPlacingOrder">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
+          </button>
+
+          <p class="secure-note">🔒 Safe & Secure. COD available on all orders.</p>
+        </section>
+      </div>
+
+    </div>
+  </ng-container>
+
+</div>
